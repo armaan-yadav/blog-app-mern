@@ -2,7 +2,10 @@ import React, { useState } from "react";
 import Button from "../../utils/Button";
 
 const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
   return (
     <section className="bg-red-300 w-full h-[calc(100vh-66px)]  ">
       <form
@@ -19,6 +22,9 @@ const Login = () => {
             name="email"
             id="email"
             className="outline-none "
+            onChange={(e) => {
+              setEmail(e.target.value);
+            }}
           />
         </div>
         <div className="flex flex-col ">
@@ -29,6 +35,9 @@ const Login = () => {
               name="password"
               id="password"
               className="outline-none w-full"
+              onChange={(e) => {
+                setPassword(e.target.value);
+              }}
             />
             <button
               className="absolute right-3 top-[50%] translate-y-[-50%]"
