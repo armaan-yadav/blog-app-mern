@@ -1,11 +1,31 @@
 import React, { useState } from "react";
 import Button from "../../utils/Button";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+  const navigator = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState();
 
+  const login = async () => {
+    if ([email, password].some((e) => e.trim() === "")) {
+      setError("All fields are required");
+    } else {
+      const response = await fetch("http://localhost:5000/api/user/login", {
+        method: "POST",
+        headers: { "Content-Type": " application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const temp = await response.json();
+      setError(temp.message);
+
+      if (response.status == 200) {
+        navigator("/");
+      }
+    }
+  };
   return (
     <section className="bg-red-300 w-full h-[calc(100vh-66px)]  ">
       <form
@@ -13,6 +33,7 @@ const Login = () => {
         className=" m-auto w-[300px] "
         onSubmit={(e) => {
           e.preventDefault();
+          login();
         }}
       >
         <div className="flex flex-col">
@@ -41,7 +62,8 @@ const Login = () => {
             />
             <button
               className="absolute right-3 top-[50%] translate-y-[-50%]"
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault();
                 setShowPassword(!showPassword);
               }}
             >
@@ -54,6 +76,7 @@ const Login = () => {
             </button>
           </div>
         </div>
+        {error && <div>{error}</div>}
         <Button text={"Log In"} style={"w-full"} />
       </form>
     </section>

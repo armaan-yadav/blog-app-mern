@@ -1,20 +1,33 @@
 import React, { useState } from "react";
 import Button from "../../utils/Button";
-import { json } from "react-router-dom";
+import { Navigate, json, useNavigate } from "react-router-dom";
 
 const Signup = () => {
+  const navigator = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [name, setname] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState();
 
   const registerUser = async () => {
-    await fetch("http://localhost:5000/api/user/signup", {
-      method: "POST",
-      headers: { "Content-Type": " application/json" },
-      body: JSON.stringify({ email, password, name }),
-    });
+    if ([name, email, password].some((e) => e.trim() === "")) {
+      setError("All fields are required");
+    } else {
+      const response = await fetch("http://localhost:5000/api/user/signup", {
+        method: "POST",
+        headers: { "Content-Type": " application/json" },
+        body: JSON.stringify({ email, password, name }),
+      });
+      const temp = await response.json();
+      setError(temp.message);
+
+      if (response.status == 200) {
+        navigator("/");
+      }
+    }
   };
+
   return (
     <section className="bg-red-300 w-full h-[calc(100vh-66px)]  ">
       <form
@@ -66,7 +79,8 @@ const Signup = () => {
             />
             <button
               className="absolute right-3 top-[50%] translate-y-[-50%]"
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault();
                 setShowPassword(!showPassword);
               }}
             >
@@ -78,6 +92,7 @@ const Signup = () => {
             </button>
           </div>
         </div>
+        {error && <p>{error}</p>}
         <Button text={"Sign Up"} style={"w-full"} />
       </form>
     </section>
