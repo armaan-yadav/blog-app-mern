@@ -3,7 +3,9 @@ import ApiError from "../utils/apiError.js";
 import ApiResponse from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
+const secret = "aslkdhqw78eq87wyehauskd";
 export const registerUser = asyncHandler(async (req, res, _) => {
   const { name, email, password } = req.body;
   if (name == "" || password == "") {
@@ -52,12 +54,42 @@ export const loginUser = asyncHandler(async (req, res, _) => {
 
   //check for password
   const isPasswordCorrect = bcrypt.compareSync(password, userExists.password);
-  if (!isPasswordCorrect) {
+  if (isPasswordCorrect) {
+    // jwt
+    jwt.sign(
+      { email, id: userExists._id, name: userExists.name },
+      secret,
+      {},
+      (err, token) => {
+        if (err) {
+          throw err;
+        }
+        return res
+          .cookie("token", token)
+          .json({ id: userExists._id, name: userExists.name });
+      }
+    );
+  } else {
     res.status(401).json({ message: "Invalid Password. Please try again" });
     throw new ApiError(401, "Invalid Password. Please try again");
   }
 
-  return res
-    .status(200)
-    .json(new ApiResponse(200, "User logged in Successfully", userExists));
+  //   return res
+  //     .status(200)
+  //     .json(new ApiResponse(200, "User logged in Successfully", userExists));
+});
+
+export const profile = asyncHandler(async (req, res, _) => {
+  const { token } = req.cookies;
+  if (!token) {
+    return res.status(401).json({ message: "no profile found" });
+  }
+  jwt.verify(token, secret, {}, (err, info) => {
+    if (err) throw err;
+    res.json(info);
+  });
+});
+
+export const logout = asyncHandler(async (req, res, _) => {
+  res.cookie("token", "").json("ok");
 });

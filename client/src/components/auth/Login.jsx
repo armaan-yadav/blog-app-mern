@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Button from "../../utils/Button";
 import { useNavigate } from "react-router-dom";
+import { UserContext } from "../../context/UserContext";
 
 const Login = () => {
   const navigator = useNavigate();
@@ -8,6 +9,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState();
+  const { setUsername } = useContext(UserContext);
 
   const login = async () => {
     if ([email, password].some((e) => e.trim() === "")) {
@@ -17,10 +19,12 @@ const Login = () => {
         method: "POST",
         headers: { "Content-Type": " application/json" },
         body: JSON.stringify({ email, password }),
+        credentials: "include",
       });
+
       const temp = await response.json();
       setError(temp.message);
-
+      setUsername(temp.name);
       if (response.status == 200) {
         navigator("/");
       }
@@ -69,7 +73,7 @@ const Login = () => {
             >
               {" "}
               <i
-                class={`fa-solid ${
+                className={`fa-solid ${
                   showPassword ? `fa-eye-slash` : `fa-eye`
                 } text-gray-400`}
               ></i>
