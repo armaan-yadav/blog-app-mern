@@ -93,3 +93,9 @@ export const profile = asyncHandler(async (req, res, _) => {
 export const logout = asyncHandler(async (req, res, _) => {
   res.cookie("token", "").json("ok");
 });
+
+export const getUserById = asyncHandler(async (req, res, _) => {
+  const { owner } = req.body;
+  const user = await User.findById(owner).select("-password");
+  res.status(200).json(user);
+});

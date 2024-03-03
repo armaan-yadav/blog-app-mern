@@ -13,10 +13,14 @@ const blogSchema = new Schema(
     },
     content: {
       type: String,
-      required: true,
     },
     imageUrl: {
       type: String,
+      required: true,
+    },
+    owner: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
       required: true,
     },
   },

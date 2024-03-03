@@ -4,7 +4,7 @@ import Button from "../../utils/Button";
 import { UserContext } from "../../context/UserContext";
 
 const Header = () => {
-  const { setUsername, username } = useContext(UserContext);
+  const { setUsername, username, setUserId } = useContext(UserContext);
   const navigate = useNavigate();
   useEffect(() => {
     const response = fetch("http://localhost:5000/api/user/profile", {
@@ -16,6 +16,7 @@ const Header = () => {
       response.json().then((userInfo) => {
         if (response.status == 200) {
           setUsername(userInfo.name);
+          setUserId(userInfo._id);
         }
       });
     });

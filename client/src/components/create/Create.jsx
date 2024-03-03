@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import { useNavigate } from "react-router-dom";
 
 const modules = {
   toolbar: [
@@ -31,13 +32,15 @@ const formats = [
   "image",
 ];
 const Create = () => {
+  const navigator = useNavigate();
   const [title, setTitle] = useState("");
   const [summary, setSummmary] = useState("");
   const [description, setDescription] = useState("");
   const [file, setFile] = useState("");
-
+  const [disabled, setDisabled] = useState(false);
   async function formSubmit(e) {
     e.preventDefault();
+    setDisabled(true);
     const data = new FormData();
     data.set("title", title);
     data.set("summary", summary);
@@ -47,8 +50,12 @@ const Create = () => {
     const response = await fetch("http://localhost:5000/api/blog/create", {
       method: "POST",
       body: data,
+      credentials: "include",
     });
-    console.log(await response.json());
+    if (response.status === 200) {
+      setDisabled(false);
+      navigator("/");
+    }
   }
 
   return (
@@ -89,7 +96,11 @@ const Create = () => {
           modules={modules}
           formats={formats}
         ></ReactQuill>
-        <button>Post</button>
+        <button
+        //  disabled={disabled}
+        >
+          Post
+        </button>
       </form>
     </div>
   );
